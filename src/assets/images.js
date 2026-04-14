@@ -29,4 +29,13 @@ export const IMAGES = {
 
   // CTA — large shade structure / construction
   cta: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1600&q=85&auto=format&fit=crop',
+
+  // ── Hospital / Medical ──────────────────────────────────────────
+  emergency:  'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=800&q=85&auto=format&fit=crop',
+  clinic:     'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=85&auto=format&fit=crop',
+  lab:        'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=800&q=85&auto=format&fit=crop',
+  radiology:  'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=85&auto=format&fit=crop',
+  surgery:    'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=800&q=85&auto=format&fit=crop',
+  physio:     'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=85&auto=format&fit=crop',
+  hospital:   'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600&q=85&auto=format&fit=crop',
 }

@@ -336,9 +336,9 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 /* When logo exists, expand brand area */
 .navbar-brand:has(.brand-logo-img) .brand-logo {
   width: auto;
-  min-width: 120px;
-  max-width: 180px;
-  height: 44px;
+  min-width: 80px;
+  max-width: 160px;
+  height: 40px;
   background: transparent;
   box-shadow: none;
   border-radius: 0;
@@ -346,11 +346,16 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 .navbar-brand:has(.brand-logo-img) .brand-logo-img {
   padding: 0;
-  height: 44px;
+  height: 40px;
   width: auto;
-  max-width: 180px;
+  max-width: 160px;
 }
 .navbar-brand:has(.brand-logo-img) .brand-text { display: none; }
+
+@media (max-width: 768px) {
+  .navbar-brand:has(.brand-logo-img) .brand-logo { max-width: 120px; height: 34px; }
+  .navbar-brand:has(.brand-logo-img) .brand-logo-img { height: 34px; max-width: 120px; }
+}
 
 /* ── Dropdown ── */
 .nav-item { position: relative; display: flex; align-items: stretch; }
@@ -434,16 +439,36 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 /* Mobile dropdown */
 @media (max-width: 768px) {
   .dropdown {
-    position: static; opacity: 1; visibility: visible; transform: none;
-    box-shadow: none; border: none; border-radius: 0;
-    background: rgba(255,255,255,0.04); margin: 4px 0;
-    max-height: 0; overflow: hidden;
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    border-right: 2px solid rgba(var(--accent-rgb),0.3);
+    border-radius: 0;
+    background: rgba(255,255,255,0.03);
+    margin: 0 0 4px 0;
+    max-height: 0;
+    overflow: hidden;
     transition: max-height 0.35s ease;
-    display: block;
   }
   .has-dropdown.mobile-open .dropdown,
   .dropdown.dropdown--open { max-height: 600px; }
-  .dropdown-item { padding: 10px 20px; }
+  .dropdown-item {
+    padding: 10px 16px;
+    font-size: 0.88rem;
+  }
+  .dropdown-item-icon { width: 28px; height: 28px; font-size: 1rem; }
+
+  /* Fix navbar links on mobile */
+  .nav-link {
+    padding: 14px 20px;
+    white-space: normal;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .nav-item { flex-direction: column; align-items: stretch; }
 }
 
 /* ── Footer ── */

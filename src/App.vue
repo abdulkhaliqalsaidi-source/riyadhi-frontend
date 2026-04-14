@@ -22,7 +22,7 @@
             <li
               v-for="sec in navItems" :key="sec.key"
               class="nav-item"
-              :class="{ 'has-dropdown': sec.content?.children?.length }"
+              :class="{ 'has-dropdown': sec.content?.children?.length, 'mobile-open': mobileDropdown === sec.key }"
               @mouseenter="openDropdown = sec.key"
               @mouseleave="openDropdown = null"
             >
@@ -30,20 +30,20 @@
               <template v-if="sec.content?.children?.length">
                 <a class="nav-link nav-link--has-arrow"
                   :href="`#section-${sec.key}`"
-                  @click.prevent="sec.isHome ? scrollToTop() : scrollTo(sec.key)">
+                  @click.prevent="toggleMobileDropdown(sec.key)">
                   {{ sec.label }}
                   <svg class="nav-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none">
                     <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                   </svg>
                 </a>
                 <!-- Dropdown -->
-                <div class="dropdown" :class="{ 'dropdown--open': openDropdown === sec.key }">
+                <div class="dropdown" :class="{ 'dropdown--open': openDropdown === sec.key || mobileDropdown === sec.key }">
                   <div class="dropdown-inner">
                     <a
                       v-for="child in sec.content.children" :key="child.label"
                       class="dropdown-item"
                       :href="child.link || '#'"
-                      @click.prevent="handleChildClick(child)"
+                      @click.prevent="handleChildClick(child); mobileDropdown = null"
                     >
                       <span v-if="child.icon" class="dropdown-item-icon">{{ child.icon }}</span>
                       <div class="dropdown-item-text">
@@ -172,6 +172,15 @@ const router     = useRouter()
 const menuOpen   = ref(false)
 const isScrolled = ref(false)
 const openDropdown = ref(null)
+const mobileDropdown = ref(null)
+
+function toggleMobileDropdown(key) {
+  if (window.innerWidth <= 768) {
+    mobileDropdown.value = mobileDropdown.value === key ? null : key
+  } else {
+    scrollTo(key)
+  }
+}
 
 const { load: loadSettings, get } = useSettings()
 const { load: loadSections, navSections } = useSections()
@@ -427,9 +436,13 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   .dropdown {
     position: static; opacity: 1; visibility: visible; transform: none;
     box-shadow: none; border: none; border-radius: 0;
-    background: rgba(255,255,255,0.04); margin: 4px 0; display: none;
+    background: rgba(255,255,255,0.04); margin: 4px 0;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s ease;
+    display: block;
   }
-  .has-dropdown.mobile-open .dropdown { display: block; }
+  .has-dropdown.mobile-open .dropdown,
+  .dropdown.dropdown--open { max-height: 600px; }
   .dropdown-item { padding: 10px 20px; }
 }
 

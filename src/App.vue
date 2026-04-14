@@ -268,8 +268,11 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 
 /* App loading state */
-.app-loading { opacity: 0; }
-.app-ready   { opacity: 1; transition: opacity 0.3s ease; }
+.app-loading { opacity: 0; pointer-events: none; }
+.app-ready   { opacity: 1; transition: opacity 0.4s ease; }
+
+/* Prevent layout shift */
+.app-loading .navbar { visibility: hidden; }
 
 /* Logo image */
 .brand-logo-img { width: 100%; height: 100%; object-fit: contain; padding: 4px; border-radius: 8px; }

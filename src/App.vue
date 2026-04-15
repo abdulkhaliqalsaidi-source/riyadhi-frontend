@@ -67,7 +67,7 @@
             </li>
 
             <li class="nav-item nav-cta">
-              <router-link to="/contact" active-class="active">تواصل معنا</router-link>
+              <router-link to="/contact" active-class="active">{{ cfg('nav_contact_label', 'تواصل معنا') }}</router-link>
             </li>
           </ul>
         </div>
@@ -119,18 +119,18 @@
               </div>
             </div>
             <div class="footer-nav-col">
-              <div class="footer-nav-title">روابط سريعة</div>
+              <div class="footer-nav-title">{{ cfg('footer_quick_links', 'روابط سريعة') }}</div>
               <ul class="footer-nav-list">
                 <template v-for="sec in navItems" :key="sec.key">
                   <li><a v-if="sec.isHome" href="/" @click.prevent="scrollToTop">{{ sec.label }}</a>
                   <a v-else :href="`#section-${sec.key}`" @click.prevent="scrollTo(sec.key)">{{ sec.label }}</a></li>
                 </template>
-                <li><router-link to="/contact">تواصل معنا</router-link></li>
-                <li><router-link to="/services">خدماتنا</router-link></li>
+                <li><router-link to="/contact">{{ cfg('nav_contact_label', 'تواصل معنا') }}</router-link></li>
+                <li><router-link to="/services">{{ cfg('footer_services_label', 'خدماتنا') }}</router-link></li>
               </ul>
             </div>
             <div class="footer-contact-col">
-              <div class="footer-nav-title">تواصل معنا</div>
+              <div class="footer-nav-title">{{ cfg('footer_contact_title', 'تواصل معنا') }}</div>
               <ul class="footer-contact-list">
                 <li>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -362,8 +362,8 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
 .nav-link {
   display: flex; align-items: center; gap: 5px;
-  color: rgba(255,255,255,0.6);
-  font-weight: 600; font-size: 0.92rem;
+  color: var(--typo-nav-color, rgba(255,255,255,0.6));
+  font-weight: 600; font-size: var(--typo-nav-size, 0.92rem);
   padding: 0 18px; position: relative;
   transition: color var(--transition);
   white-space: nowrap; cursor: pointer;

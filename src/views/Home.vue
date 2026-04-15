@@ -92,7 +92,7 @@
               </li>
             </ul>
             <router-link to="/contact" class="btn btn-primary" style="margin-top:32px">
-              احصل على عرض سعر
+              {{ cfg('about_cta_btn', 'احصل على عرض سعر') }}
             </router-link>
           </div>
         </div>
@@ -119,14 +119,14 @@
                 <h3>{{ sv.name_ar }}</h3>
                 <p>{{ sv.description_ar }}</p>
                 <a :href="`https://wa.me/${cfg('whatsapp_number','966500000000')}`" target="_blank" class="svc-link">
-                  اطلب الخدمة
+                  {{ cfg('services_request_btn', 'اطلب الخدمة') }}
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
               </div>
             </div>
           </div>
           <div class="services-cta">
-            <router-link to="/services" class="btn btn-dark">عرض جميع الخدمات</router-link>
+            <router-link to="/services" class="btn btn-dark">{{ cfg('services_view_all', 'عرض جميع الخدمات') }}</router-link>
           </div>
         </div>
       </section>
@@ -600,14 +600,14 @@ onMounted(async () => {
 
 .hero-title {
   padding-top: 20px;
-  height: 120px;
-  font-size: clamp(2.6rem, 5.5vw, 4.4rem); font-weight: 900; line-height: 1.1;
-  background: linear-gradient(160deg, #ffffff 0%, rgba(255,255,255,0.7) 100%);
+  height: 70px;
+  font-size: var(--typo-hero-size, clamp(2.6rem, 5.5vw, 4.4rem)); font-weight: 900; line-height: 1.1;
+  background: linear-gradient(160deg, var(--typo-hero-color, #ffffff) 0%, rgba(255,255,255,0.7) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   letter-spacing: -0.02em;
 }
 .hero-sub {
-  color: rgba(255,255,255,0.5); font-size: 1.08rem; line-height: 1.85;
+  color: var(--typo-hero-sub-color, rgba(255,255,255,0.5)); font-size: var(--typo-hero-sub-size, 1.08rem); line-height: 1.85;
   margin-top: 20px; max-width: 520px;
 }
 .hero-actions { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
@@ -696,8 +696,8 @@ onMounted(async () => {
 .strip-stat span { font-size: 0.7rem; color: var(--text-muted); }
 
 .about-text { padding-bottom: 24px; }
-.about-text h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 900; color: var(--text); line-height: 1.25; margin-top: 14px; letter-spacing: -0.01em; }
-.about-text p { color: var(--text-muted); line-height: 1.9; font-size: 1rem; margin-top: 18px; }
+.about-text h2 { font-size: var(--typo-h2-size, clamp(1.7rem, 3vw, 2.3rem)); font-weight: 900; color: var(--typo-h2-color, var(--text)); line-height: 1.25; margin-top: 14px; letter-spacing: -0.01em; }
+.about-text p { color: var(--typo-body-color, var(--text-muted)); line-height: 1.9; font-size: var(--typo-body-size, 1rem); margin-top: 18px; }
 .accent-line { width: 52px; height: 3px; background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); border-radius: 3px; margin-top: 18px; }
 .about-features { list-style: none; margin-top: 22px; display: flex; flex-direction: column; gap: 12px; }
 .about-features li { display: flex; align-items: center; gap: 12px; color: var(--text); font-size: 0.97rem; }
@@ -735,8 +735,8 @@ onMounted(async () => {
   box-shadow: 0 4px 12px rgba(59,130,246,0.4);
 }
 .svc-body { padding: 24px; position: relative; z-index: 1; }
-.svc-body h3 { font-size: 1.08rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
-.svc-body p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.75; }
+.svc-body h3 { font-size: var(--typo-card-size, 1.08rem); font-weight: 800; color: var(--typo-card-color, var(--text)); margin-bottom: 10px; }
+.svc-body p { color: var(--typo-body-color, var(--text-muted)); font-size: var(--typo-body-size, 0.9rem); line-height: 1.75; }
 .svc-link {
   display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
   color: var(--neon-blue); font-weight: 700; font-size: 0.88rem; transition: gap 0.25s;

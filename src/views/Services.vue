@@ -5,13 +5,13 @@
       <div class="page-hero-photo" :style="`background-image:url('${IMAGES.building}')`"></div>
       <div class="page-hero-overlay"></div>
       <div class="container" style="position:relative;z-index:1">
-        <div class="sec-tag">ما نقدمه</div>
-        <h1>خدماتنا <span>المتميزة</span></h1>
-        <p>حلول متكاملة في البناء والتشييد بأعلى معايير الجودة</p>
+        <div class="sec-tag">{{ cfg('services_page_tag', 'ما نقدمه') }}</div>
+        <h1>{{ cfg('services_page_title', 'خدماتنا') }} <span>{{ cfg('services_page_subtitle', 'المتميزة') }}</span></h1>
+        <p>{{ cfg('services_page_desc', 'حلول متكاملة في البناء والتشييد بأعلى معايير الجودة') }}</p>
         <div class="breadcrumb">
-          <router-link to="/">الرئيسية</router-link>
+          <router-link to="/">{{ cfg('breadcrumb_home', 'الرئيسية') }}</router-link>
           <span>›</span>
-          <span>الخدمات</span>
+          <span>{{ cfg('breadcrumb_services', 'الخدمات') }}</span>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
               </div>
             </div>
             <div class="svc-row-body">
-              <div class="sec-tag">خدمة</div>
+              <div class="sec-tag">{{ cfg('services_item_tag', 'خدمة') }}</div>
               <h2>{{ sv.name_ar }}</h2>
               <div class="gold-line" style="margin:14px 0;"></div>
               <p>{{ sv.description_ar }}</p>
@@ -47,7 +47,7 @@
                 </li>
               </ul>
               <a :href="`https://wa.me/${cfg('whatsapp_number', '966500000000')}`" target="_blank" class="btn btn-primary" style="margin-top:28px">
-                اطلب هذه الخدمة
+                {{ cfg('services_request_btn', 'اطلب هذه الخدمة') }}
               </a>
             </div>
           </div>
@@ -62,11 +62,11 @@
           <div class="cta-card-photo" :style="`background-image:url('${IMAGES.cta}')`"></div>
           <div class="cta-card-overlay"></div>
           <div class="cta-card-content">
-            <h2>لم تجد ما تبحث عنه؟</h2>
-            <p>تواصل معنا وسنقدم لك الحل المناسب لمشروعك</p>
+            <h2>{{ cfg('services_cta_title', 'لم تجد ما تبحث عنه؟') }}</h2>
+            <p>{{ cfg('services_cta_desc', 'تواصل معنا وسنقدم لك الحل المناسب لمشروعك') }}</p>
             <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:28px">
-              <router-link to="/contact" class="btn btn-primary">تواصل معنا</router-link>
-              <a :href="`https://wa.me/${cfg('whatsapp_number', '966500000000')}`" target="_blank" class="btn btn-outline">واتساب</a>
+              <router-link to="/contact" class="btn btn-primary">{{ cfg('nav_contact_label', 'تواصل معنا') }}</router-link>
+              <a :href="`https://wa.me/${cfg('whatsapp_number', '966500000000')}`" target="_blank" class="btn btn-outline">{{ cfg('hero_btn2', 'واتساب') }}</a>
             </div>
           </div>
         </div>

@@ -6,7 +6,6 @@ const loaded   = ref(false)
 
 export function useSettings() {
   async function load() {
-    if (loaded.value) return
     const { data } = await api.get('/settings')
     settings.value = data
     loaded.value   = true
@@ -68,6 +67,25 @@ export function useSettings() {
       root.style.setProperty('--font', s.font_family)
       document.body.style.fontFamily = `'${s.font_family}', 'Tajawal', 'Inter', sans-serif`
     }
+
+    // ── Typography ──
+    const typoMap = {
+      typo_hero_size:      '--typo-hero-size',
+      typo_hero_color:     '--typo-hero-color',
+      typo_hero_sub_size:  '--typo-hero-sub-size',
+      typo_hero_sub_color: '--typo-hero-sub-color',
+      typo_h2_size:        '--typo-h2-size',
+      typo_h2_color:       '--typo-h2-color',
+      typo_body_size:      '--typo-body-size',
+      typo_body_color:     '--typo-body-color',
+      typo_card_size:      '--typo-card-size',
+      typo_card_color:     '--typo-card-color',
+      typo_nav_size:       '--typo-nav-size',
+      typo_nav_color:      '--typo-nav-color',
+    }
+    Object.entries(typoMap).forEach(([key, cssVar]) => {
+      if (s[key]) root.style.setProperty(cssVar, s[key])
+    })
   }
 
   function get(key, fallback = '') {

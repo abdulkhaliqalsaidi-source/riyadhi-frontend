@@ -346,6 +346,22 @@
             </div>
           </div>
 
+          <!-- ── Services Page ── -->
+          <div v-if="editorTab === 'services'" class="editor-section">
+            <div class="editor-section-title">⚙️ صفحة الخدمات</div>
+            <div class="field-list">
+              <div class="field-row" v-for="f in servicesPageFields" :key="f.key">
+                <div class="field-label">{{ f.label }}</div>
+                <div class="field-input-wrap">
+                  <input class="field-input" v-model="form[f.key]" :placeholder="f.placeholder || ''" />
+                </div>
+                <button class="field-save-btn" @click="saveField(f.key)" :disabled="savingField === f.key">
+                  {{ savingField === f.key ? '...' : '💾' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- ── CTA ── -->
           <div v-if="editorTab === 'cta'" class="editor-section">
             <div class="editor-section-title">📣 قسم الدعوة للتواصل</div>
@@ -434,6 +450,38 @@
                     <span class="font-chip-name">{{ font.label }}</span>
                     <span class="font-chip-sample" :style="`font-family:'${font.value}',sans-serif`">أبجد هوز</span>
                   </button>
+                </div>
+              </div>
+
+              <!-- Typography Controls -->
+              <div class="editor-section-title" style="margin-top:24px">📐 أحجام وألوان النصوص</div>
+              <div class="typography-grid">
+                <div class="typo-card" v-for="t in typographyFields" :key="t.key">
+                  <div class="typo-label">{{ t.label }}</div>
+                  <div class="typo-preview" :style="`font-size:${form[t.sizeKey] || t.defaultSize};color:${form[t.colorKey] || 'var(--text)'}`">
+                    {{ t.sample }}
+                  </div>
+                  <div class="typo-controls">
+                    <div class="typo-size">
+                      <label>الحجم</label>
+                      <div class="typo-size-btns">
+                        <button type="button" v-for="s in fontSizes" :key="s.v"
+                          class="typo-size-btn" :class="{ active: (form[t.sizeKey] || t.defaultSize) === s.v }"
+                          @click="setTypo(t.sizeKey, s.v)">{{ s.l }}</button>
+                      </div>
+                    </div>
+                    <div class="typo-color">
+                      <label>اللون</label>
+                      <div class="typo-color-row">
+                        <div class="cpc-swatch-wrap" style="width:32px;height:32px">
+                          <input type="color" :value="form[t.colorKey] || t.defaultColor" @input="setTypo(t.colorKey, $event.target.value)" class="cpc-native" />
+                          <div class="cpc-swatch" :style="`background:${form[t.colorKey] || t.defaultColor};width:32px;height:32px;border-radius:8px`"></div>
+                        </div>
+                        <input class="cpc-hex" style="flex:1;max-width:100px" :value="form[t.colorKey] || t.defaultColor" @input="setTypo(t.colorKey, $event.target.value)" maxlength="7" />
+                        <button class="field-save-btn" @click="saveFields([t.sizeKey, t.colorKey])">💾</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -819,10 +867,11 @@ const navItems = computed(() => [
 ])
 
 const editorTabs = [
-  { id: 'company', icon: '🏢', label: 'الشركة' },
-  { id: 'hero',    icon: '🦸', label: 'الهيرو' },
-  { id: 'about',   icon: 'ℹ️', label: 'من نحن' },
-  { id: 'cta',     icon: '📣', label: 'CTA & ألوان' },
+  { id: 'company',  icon: '🏢', label: 'الشركة' },
+  { id: 'hero',     icon: '🦸', label: 'الهيرو' },
+  { id: 'about',    icon: 'ℹ️', label: 'من نحن' },
+  { id: 'services', icon: '⚙️', label: 'الخدمات' },
+  { id: 'cta',      icon: '📣', label: 'CTA & ألوان' },
 ]
 
 const currentTitle = computed(() => navItems.value.find(n => n.id === activeTab.value)?.label ?? '')
@@ -1187,9 +1236,11 @@ async function loadPartners() {
 const form          = ref({})
 const savingField   = ref(null)
 const savingFeatures = ref(false)
+const loadingForm   = ref(false)
 
 // Auto-save logo when changed via ImagePicker
 watch(() => form.value.logo, (val, old) => {
+  if (loadingForm.value) return // skip during form load
   if (old === undefined) return // skip initial load
   if (val !== old) saveField('logo')
 })
@@ -1197,12 +1248,31 @@ const aboutFeaturesList = ref([])
 const newFeature    = ref('')
 
 const companyFields = [
-  { key: 'company_name_ar',  label: 'اسم الشركة (عربي)' },
-  { key: 'company_name',     label: 'اسم الشركة (إنجليزي)' },
-  { key: 'whatsapp_number',  label: 'رقم واتساب', placeholder: '966500000000' },
-  { key: 'phone',            label: 'رقم الهاتف' },
-  { key: 'location',         label: 'الموقع' },
-  { key: 'working_hours',    label: 'ساعات العمل' },
+  { key: 'company_name_ar',      label: 'اسم الشركة (عربي)' },
+  { key: 'company_name',         label: 'اسم الشركة (إنجليزي)' },
+  { key: 'whatsapp_number',      label: 'رقم واتساب', placeholder: '966500000000' },
+  { key: 'phone',                label: 'رقم الهاتف' },
+  { key: 'location',             label: 'الموقع' },
+  { key: 'working_hours',        label: 'ساعات العمل' },
+  { key: 'nav_contact_label',    label: 'نص زر التواصل في النافبار' },
+  { key: 'footer_quick_links',   label: 'عنوان روابط الفوتر' },
+  { key: 'footer_contact_title', label: 'عنوان تواصل الفوتر' },
+  { key: 'footer_services_label',label: 'نص رابط الخدمات في الفوتر' },
+  { key: 'about_cta_btn',        label: 'نص زر قسم من نحن' },
+]
+
+const servicesPageFields = [
+  { key: 'services_request_btn',  label: 'نص زر طلب الخدمة' },
+  { key: 'services_view_all',     label: 'نص زر عرض جميع الخدمات' },
+  { key: 'services_page_tag',     label: 'تاغ صفحة الخدمات' },
+  { key: 'services_page_title',   label: 'عنوان صفحة الخدمات' },
+  { key: 'services_page_subtitle',label: 'الكلمة المميزة في العنوان' },
+  { key: 'services_page_desc',    label: 'وصف صفحة الخدمات' },
+  { key: 'services_item_tag',     label: 'تاغ كل خدمة' },
+  { key: 'services_cta_title',    label: 'عنوان CTA صفحة الخدمات' },
+  { key: 'services_cta_desc',     label: 'وصف CTA صفحة الخدمات' },
+  { key: 'breadcrumb_home',       label: 'نص الرئيسية في Breadcrumb' },
+  { key: 'breadcrumb_services',   label: 'نص الخدمات في Breadcrumb' },
 ]
 const heroFields = [
   { key: 'hero_title',    label: 'العنوان الرئيسي' },
@@ -1250,6 +1320,47 @@ const fontOptions = [
   { label: 'بوبينز',   value: 'Poppins' },
   { label: 'رالوي',    value: 'Raleway' },
 ]
+
+const fontSizes = [
+  { v: '0.8rem',  l: 'XS' },
+  { v: '0.9rem',  l: 'S' },
+  { v: '1rem',    l: 'M' },
+  { v: '1.1rem',  l: 'L' },
+  { v: '1.25rem', l: 'XL' },
+  { v: '1.5rem',  l: '2X' },
+  { v: '2rem',    l: '3X' },
+]
+
+const typographyFields = [
+  { label: 'عنوان الهيرو',     sizeKey: 'typo_hero_size',    colorKey: 'typo_hero_color',    defaultSize: 'clamp(2.6rem,5.5vw,4.4rem)', defaultColor: '#ffffff', sample: 'عنوان رئيسي' },
+  { label: 'نص الهيرو',        sizeKey: 'typo_hero_sub_size',colorKey: 'typo_hero_sub_color',defaultSize: '1.08rem',                    defaultColor: 'rgba(255,255,255,0.5)', sample: 'نص توضيحي' },
+  { label: 'عناوين الأقسام',   sizeKey: 'typo_h2_size',      colorKey: 'typo_h2_color',      defaultSize: 'clamp(1.7rem,3vw,2.3rem)',   defaultColor: '#f1f5f9', sample: 'عنوان القسم' },
+  { label: 'النصوص العادية',   sizeKey: 'typo_body_size',    colorKey: 'typo_body_color',    defaultSize: '1rem',                       defaultColor: '#64748b', sample: 'نص عادي' },
+  { label: 'عناوين البطاقات',  sizeKey: 'typo_card_size',    colorKey: 'typo_card_color',    defaultSize: '1rem',                       defaultColor: '#f1f5f9', sample: 'عنوان البطاقة' },
+  { label: 'روابط النافبار',   sizeKey: 'typo_nav_size',     colorKey: 'typo_nav_color',     defaultSize: '0.92rem',                    defaultColor: 'rgba(255,255,255,0.6)', sample: 'رابط' },
+]
+
+function setTypo(key, val) {
+  form.value[key] = val
+  applyTypography()
+}
+
+function applyTypography() {
+  const root = document.documentElement
+  const f = form.value
+  if (f.typo_hero_size)     root.style.setProperty('--typo-hero-size',     f.typo_hero_size)
+  if (f.typo_hero_color)    root.style.setProperty('--typo-hero-color',    f.typo_hero_color)
+  if (f.typo_hero_sub_size) root.style.setProperty('--typo-hero-sub-size', f.typo_hero_sub_size)
+  if (f.typo_hero_sub_color)root.style.setProperty('--typo-hero-sub-color',f.typo_hero_sub_color)
+  if (f.typo_h2_size)       root.style.setProperty('--typo-h2-size',       f.typo_h2_size)
+  if (f.typo_h2_color)      root.style.setProperty('--typo-h2-color',      f.typo_h2_color)
+  if (f.typo_body_size)     root.style.setProperty('--typo-body-size',     f.typo_body_size)
+  if (f.typo_body_color)    root.style.setProperty('--typo-body-color',    f.typo_body_color)
+  if (f.typo_card_size)     root.style.setProperty('--typo-card-size',     f.typo_card_size)
+  if (f.typo_card_color)    root.style.setProperty('--typo-card-color',    f.typo_card_color)
+  if (f.typo_nav_size)      root.style.setProperty('--typo-nav-size',      f.typo_nav_size)
+  if (f.typo_nav_color)     root.style.setProperty('--typo-nav-color',     f.typo_nav_color)
+}
 
 const previewBarStyle = computed(() => ({
   background: form.value.color_dark || '#030712',
@@ -1299,11 +1410,23 @@ async function saveTheme() {
   savingTheme.value = true
   try {
     const payload = {
-      color_primary: form.value.color_primary,
-      color_accent:  form.value.color_accent,
-      color_dark:    form.value.color_dark,
-      color_text:    form.value.color_text,
-      font_family:   form.value.font_family,
+      color_primary:      form.value.color_primary,
+      color_accent:       form.value.color_accent,
+      color_dark:         form.value.color_dark,
+      color_text:         form.value.color_text,
+      font_family:        form.value.font_family,
+      typo_hero_size:     form.value.typo_hero_size,
+      typo_hero_color:    form.value.typo_hero_color,
+      typo_hero_sub_size: form.value.typo_hero_sub_size,
+      typo_hero_sub_color:form.value.typo_hero_sub_color,
+      typo_h2_size:       form.value.typo_h2_size,
+      typo_h2_color:      form.value.typo_h2_color,
+      typo_body_size:     form.value.typo_body_size,
+      typo_body_color:    form.value.typo_body_color,
+      typo_card_size:     form.value.typo_card_size,
+      typo_card_color:    form.value.typo_card_color,
+      typo_nav_size:      form.value.typo_nav_size,
+      typo_nav_color:     form.value.typo_nav_color,
     }
     await api.put('/dashboard/settings', payload)
     await refreshSettings()
@@ -1312,12 +1435,46 @@ async function saveTheme() {
   finally { savingTheme.value = false }
 }
 
+// Map: setting key → { section key, content field }
+const sectionFieldMap = {
+  hero_title:    { sec: 'hero',  field: 'title' },
+  hero_subtitle: { sec: 'hero',  field: 'subtitle' },
+  hero_badge:    { sec: 'hero',  field: 'badge' },
+  hero_btn1:     { sec: 'hero',  field: 'btn1' },
+  hero_btn2:     { sec: 'hero',  field: 'btn2' },
+  about_title:   { sec: 'about', field: 'title' },
+  about_text:    { sec: 'about', field: 'text' },
+  about_since:   { sec: 'about', field: 'since' },
+  cta_title:     { sec: 'cta',   field: 'title' },
+  cta_subtitle:  { sec: 'cta',   field: 'subtitle' },
+}
+
+async function syncSectionContent(keys, values) {
+  // Group keys by section
+  const bySection = {}
+  keys.forEach((key, i) => {
+    const map = sectionFieldMap[key]
+    if (!map) return
+    if (!bySection[map.sec]) bySection[map.sec] = {}
+    bySection[map.sec][map.field] = values[i]
+  })
+  // Update each affected section
+  for (const [secKey, fields] of Object.entries(bySection)) {
+    const sec = allSections.value.find(s => s.key === secKey)
+    if (!sec) continue
+    const newContent = { ...(sec.content || {}), ...fields }
+    await api.put(`/dashboard/sections/${sec.id}`, { content: newContent })
+    sec.content = newContent
+  }
+}
+
 async function saveField(key) {
   savingField.value = key
   try {
     const val = form.value[key]
-    // Send only the specific field, convert null/undefined to empty string
     await api.put('/dashboard/settings', { [key]: val ?? '' })
+    // Also sync to section content if applicable
+    await syncSectionContent([key], [val])
     await refreshSettings()
     showToast('تم الحفظ ✓')
   } catch { showToast('حدث خطأ', 'error') }
@@ -1336,6 +1493,7 @@ async function saveFields(keys) {
   keys.forEach(k => payload[k] = form.value[k])
   try {
     await api.put('/dashboard/settings', payload)
+    await syncSectionContent(keys, keys.map(k => form.value[k]))
     await refreshSettings()
     showToast('تم الحفظ ✓')
   } catch { showToast('حدث خطأ', 'error') }
@@ -1353,8 +1511,16 @@ function removeFeature(idx) {
 async function saveFeatures() {
   savingFeatures.value = true
   try {
-    const val = JSON.stringify(aboutFeaturesList.value.filter(Boolean))
+    const list = aboutFeaturesList.value.filter(Boolean)
+    const val = JSON.stringify(list)
     await api.put('/dashboard/settings', { about_features: val })
+    // Sync features to about section content
+    const aboutSec = allSections.value.find(s => s.key === 'about')
+    if (aboutSec) {
+      const newContent = { ...(aboutSec.content || {}), features: list }
+      await api.put(`/dashboard/sections/${aboutSec.id}`, { content: newContent })
+      aboutSec.content = newContent
+    }
     await refreshSettings()
     showToast('تم حفظ المميزات ✓')
   } catch { showToast('حدث خطأ', 'error') }
@@ -1362,9 +1528,38 @@ async function saveFeatures() {
 }
 
 async function loadSettingsForm() {
+  loadingForm.value = true
   const { data } = await api.get('/settings')
-  form.value = { ...data }
-  try { aboutFeaturesList.value = JSON.parse(data.about_features || '[]') } catch { aboutFeaturesList.value = [] }
+  // Update properties individually to preserve reactivity on open inputs
+  Object.keys(data).forEach(k => { form.value[k] = data[k] })
+  // Override with actual section content (source of truth for the site)
+  const heroSec  = allSections.value.find(s => s.key === 'hero')
+  const aboutSec = allSections.value.find(s => s.key === 'about')
+  const ctaSec   = allSections.value.find(s => s.key === 'cta')
+  if (heroSec?.content) {
+    if (heroSec.content.title)    form.value.hero_title    = heroSec.content.title
+    if (heroSec.content.subtitle) form.value.hero_subtitle = heroSec.content.subtitle
+    if (heroSec.content.badge)    form.value.hero_badge    = heroSec.content.badge
+    if (heroSec.content.btn1)     form.value.hero_btn1     = heroSec.content.btn1
+    if (heroSec.content.btn2)     form.value.hero_btn2     = heroSec.content.btn2
+  }
+  if (aboutSec?.content) {
+    if (aboutSec.content.title)    form.value.about_title = aboutSec.content.title
+    if (aboutSec.content.text)     form.value.about_text  = aboutSec.content.text
+    if (aboutSec.content.since)    form.value.about_since = aboutSec.content.since
+    if (aboutSec.content.features) {
+      aboutFeaturesList.value = aboutSec.content.features
+      form.value.about_features = JSON.stringify(aboutSec.content.features)
+    }
+  }
+  if (ctaSec?.content) {
+    if (ctaSec.content.title)    form.value.cta_title    = ctaSec.content.title
+    if (ctaSec.content.subtitle) form.value.cta_subtitle = ctaSec.content.subtitle
+  }
+  if (!aboutSec?.content?.features) {
+    try { aboutFeaturesList.value = JSON.parse(data.about_features || '[]') } catch { aboutFeaturesList.value = [] }
+  }
+  loadingForm.value = false
 }
 
 // ── Media ──────────────────────────────────────────────
@@ -1494,7 +1689,9 @@ function fmtDate(d) {
 }
 
 onMounted(async () => {
-  await Promise.all([loadStats(), loadContacts(), loadServices(), loadSections(), loadPartners(), loadSettingsForm(), loadMedia(), loadUsers()])
+  // Load sections first so loadSettingsForm can read section content
+  await loadSections()
+  await Promise.all([loadStats(), loadContacts(), loadServices(), loadPartners(), loadSettingsForm(), loadMedia(), loadUsers()])
   await fetchUnreadCount()
   pollTimer = setInterval(fetchUnreadCount, 30000)
 })
@@ -1859,6 +2056,20 @@ onUnmounted(() => {
 }
 .spinner { width: 26px; height: 26px; border: 3px solid rgba(59,130,246,0.15); border-top-color: var(--neon-blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 20px auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Typography Controls ── */
+.typography-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.typo-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.typo-label { font-size: 0.78rem; font-weight: 800; color: var(--text); }
+.typo-preview { padding: 10px; background: var(--bg2); border-radius: 8px; font-weight: 700; min-height: 40px; display: flex; align-items: center; border: 1px solid var(--border); }
+.typo-controls { display: flex; flex-direction: column; gap: 8px; }
+.typo-size label, .typo-color label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; }
+.typo-size-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+.typo-size-btn { padding: 4px 8px; border: 1px solid var(--border); background: var(--bg2); color: var(--text-muted); border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 700; transition: all 0.15s; }
+.typo-size-btn:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+.typo-size-btn.active { background: var(--neon-blue); color: white; border-color: var(--neon-blue); }
+.typo-color-row { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 600px) { .typography-grid { grid-template-columns: 1fr; } }
 
 /* ── Partners / Services inline editor ── */
 .partners-editor-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
